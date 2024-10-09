@@ -1,34 +1,49 @@
 <script setup>
+import { requiredValidator, emailValidator } from '@/utils/validators'
 import { ref } from 'vue'
 
-const visible = ref(false)
+const isPasswordVisible = ref(false)
+const refVForm = ref()
+
+const formDataDefault = {
+  email: '',
+  password: ''
+}
+
+const formData = ref({
+  ...formDataDefault
+})
+
+const onSubmit = () => {
+  alert(formData.value.email)
+}
+
+const onFormSubmit = () => {
+  refVForm.value?.validate().then(({ valid }) => {
+    if (valid) onSubmit()
+  })
+}
 </script>
+
 <template>
-  <div>
-    <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
-      <div class="text-subtitle-1 text-medium-emphasis">Account</div>
+  <v-form ref="refVForm" @submit.prevent="onFormSubmit">
+    <v-text-field
+      v-model="formData.email"
+      label="Email"
+      prepend-inner-icon="mdi-email-outline"
+      :rules="[requiredValidator, emailValidator]"
+    ></v-text-field>
 
-      <v-text-field
-        density="compact"
-        placeholder="Email address"
-        prepend-inner-icon="mdi-email-outline"
-        variant="outlined"
-      ></v-text-field>
+    <v-text-field
+      v-model="formData.password"
+      prepend-inner-icon="mdi-lock-outline"
+      label="Password"
+      :type="isPasswordVisible ? 'text' : 'password'"
+      :append-inner-icon="isPasswordVisible ? 'mdi-eye-off' : 'mdi-eye'"
+      @click:append-inner="isPasswordVisible = !isPasswordVisible"
+      :rules="[requiredValidator]"
+    ></v-text-field>
 
-      <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-        Password
-      </div>
-
-      <v-text-field
-        :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-        :type="visible ? 'text' : 'password'"
-        density="compact"
-        placeholder="Enter your password"
-        prepend-inner-icon="mdi-lock-outline"
-        variant="outlined"
-        @click:append-inner="visible = !visible"
-      ></v-text-field>
-      <v-btn class="mt-2" type="submit" block color="#F7971D" prepend-icon="mdi-login">Login</v-btn>
-    </v-card>
-  </div>
+    <v-btn class="mt-2" type="submit" block color="#F7971D" prepend-icon="mdi-login"> Login </v-btn>
+  </v-form>
 </template>
